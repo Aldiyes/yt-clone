@@ -1,6 +1,6 @@
 @Iyesss
 
-# #01 Setup
+# #01 Installation
 
 ### Configure environtment
 
