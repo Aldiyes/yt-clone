@@ -3,6 +3,7 @@ import { FaYoutube } from 'react-icons/fa';
 
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
+import { AuthButton } from '@/modules/auth/ui/components/auth-button';
 import { SearchInput } from '@/modules/home/ui/components/home-navbar/search-input';
 
 export const HomeNavbar = () => {
@@ -22,9 +23,14 @@ export const HomeNavbar = () => {
 					</Link>
 				</div>
 
-				{/* TODO: add Search bar */}
+				{/* Search bar */}
 				<div className="flex flex-1 justify-center max-w-[720px] mx-auto">
 					<SearchInput />
+				</div>
+
+				{/* Auth button */}
+				<div className="flex shrink-0 items-center gap-4">
+					<AuthButton />
 				</div>
 			</div>
 		</nav>
