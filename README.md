@@ -1,27 +1,19 @@
 @Iyesss
 
-# #01 Installation
+# #01 Project Setup
 
-### Configure environtment
+### Setup Shadcn
 
-- runtime `node.js`
-- package manager `npm`
-- Next.js version `15.3.2`
-
-### Create Next.js App
-
-run:
+installation:
 
 ```bash
-npx create-next-app@latest
+npx shadcn@latest init
 ```
 
-configuration:
+- color `Neutral`
 
-- TypeScript `Yes`
-- ESLint `Yes`
-- Tailwind CSS `Yes`
-- `src/` directory `Yes`
-- App Router `Yes`
-- Turbopack `No`
-- Import alias `No`
+Add `All` Component
+
+```bash
+npx shadcn@latest add --all
+```
