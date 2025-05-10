@@ -1,4 +1,5 @@
 import Link from 'next/link';
+
 import { FaYoutube } from 'react-icons/fa';
 
 import { SidebarTrigger } from '@/components/ui/sidebar';
