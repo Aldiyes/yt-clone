@@ -2,7 +2,7 @@
 
 # #03 Authentication
 
-### Integration Clerk
+### Integration [Clerk](https://clerk.com/)
 
 - install `@clerk/nextjs@6.19.2`
 
