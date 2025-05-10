@@ -1,11 +1,14 @@
 'use client';
 
-import { useAuth, useClerk } from '@clerk/nextjs';
 import Link from 'next/link';
 
-import { AiFillPlaySquare, AiOutlinePlaySquare } from 'react-icons/ai';
-import { MdHome, MdOutlineHome } from 'react-icons/md';
-import { TbFlame, TbFlameFilled } from 'react-icons/tb';
+// import { AiFillPlaySquare, AiOutlinePlaySquare } from 'react-icons/ai';
+// import { MdHome, MdOutlineHome } from 'react-icons/md';
+// import { TbFlame, TbFlameFilled } from 'react-icons/tb';
+
+import { AiOutlinePlaySquare } from 'react-icons/ai';
+import { MdOutlineHome } from 'react-icons/md';
+import { TbFlame } from 'react-icons/tb';
 
 import {
 	SidebarGroup,
@@ -35,9 +38,6 @@ const ITEMS = [
 ];
 
 export const MainSection = () => {
-	const { isSignedIn } = useAuth();
-	const clerk = useClerk();
-
 	return (
 		<SidebarGroup>
 			<SidebarGroupContent>
@@ -48,12 +48,7 @@ export const MainSection = () => {
 								tooltip={item.title}
 								asChild
 								isActive={false} // TODO: change to look at current pathname
-								onClick={(e) => {
-									if (!isSignedIn && item.auth) {
-										e.preventDefault();
-										return clerk.openSignIn();
-									}
-								}}
+								onClick={() => {}} // TODO: do something on click
 							>
 								<Link href={item.url} className="flex items-center gap-4">
 									<item.icon />
