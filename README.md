@@ -33,24 +33,25 @@ export const config = {
 ### Add `ClerkProvider` to root layout
 
 ```html
-import { ClerkProvider } from '@clerk/nextjs'
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
-  return (
-    <ClerkProvider> // this one
-      <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
-  )
-}
+import { ClerkProvider } from '@clerk/nextjs' export default function
+RootLayout({ children, }: Readonly<{ children: React.ReactNode }>) { return (
+<ClerkProvider>
+	// this one
+	<html lang="en">
+		<body
+			className="{`${geistSans.variable}"
+			${geistMono.variable}
+			antialiased`}
+		>
+			{children}
+		</body>
+	</html>
+</ClerkProvider>
+) }
 ```
+
 ### Build a sign-in-or-up page on `src/app/sign-in/[[...sign-in]]/page.tsx`
+
 ```bash
 import { SignIn } from '@clerk/nextjs'
 
@@ -60,6 +61,7 @@ export default function Page() {
 ```
 
 ### Add to `.env`:
+
 `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
 `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
 `NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/`
