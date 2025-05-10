@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth, useClerk } from '@clerk/nextjs';
 import Link from 'next/link';
 
 import { AiFillPlaySquare, AiOutlinePlaySquare } from 'react-icons/ai';
@@ -34,6 +35,9 @@ const ITEMS = [
 ];
 
 export const MainSection = () => {
+	const { isSignedIn } = useAuth();
+	const clerk = useClerk();
+
 	return (
 		<SidebarGroup>
 			<SidebarGroupContent>
@@ -44,7 +48,12 @@ export const MainSection = () => {
 								tooltip={item.title}
 								asChild
 								isActive={false} // TODO: change to look at current pathname
-								onClick={() => {}} // TODO: do something on click
+								onClick={(e) => {
+									if (!isSignedIn && item.auth) {
+										e.preventDefault();
+										return clerk.openSignIn();
+									}
+								}}
 							>
 								<Link href={item.url} className="flex items-center gap-4">
 									<item.icon />
