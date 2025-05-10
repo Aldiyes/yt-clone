@@ -1,72 +1,72 @@
 @Aldiyes
 
-# #03 Authentication
+# #04 Database setup
 
-### Integration [Clerk](https://clerk.com/)
+using `PostgreSQL` for database
+using `drizzleORM` ORM (Object Relation Mapping)
+why drizzleORM
 
-- install `@clerk/nextjs@6.19.2`
+- only ORM with both relational and SQL-like query APIs
+- Serverless by default
+- Forcing to "Understand" our queries
+
+### Create a PostgreSQL database using [neon.tech](https://console.neon.tech)
+
+Copy and paste `DATABASE_URL` from neon.tech to `.env`
+
+### Setup DrizzleORM
+
+- Install @neondatabase/serverless package
+
+```shell
+npm i drizzle-orm @neondatabase/serverless dotenv
+npm i -D drizzle-kit tsx
+```
+
+- Connect Drizzle ORM to the database
+  create file on `src/db` called: `index.ts`
 
 ```bash
-npm install @clerk/nextjs
+import { drizzle } from 'drizzle-orm/neon-http';
+
+const db = drizzle(process.env.DATABASE_URL);
 ```
 
-### Set Clerk API Keys on `.env`
+- Create user schema
+  create file on `src/db` called: `schema.ts`
 
-`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=`
-`CLERK_SECRET_KEY=`
+```js
+import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-### Add `middleware.ts`
+export const users = pgTable('users', {
+  id: uuid().primaryKey().defaultRandom(),
+  clerkId: text('clerk_id').unique().notNull(),
+  name: text('name').notNull(),
+  imageUrl: text('image_url').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+```
 
+- Setup Drizzle Config file
+  create a file on root called : `drizzle.config.ts`
+
+```js
+import 'dotenv/config';
+import { defineConfig } from 'drizzle-kit';
+
+export default defineConfig({
+  out: './drizzle',
+  schema: './src/db/schema.ts',
+  dialect: 'postgresql',
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+
+```
+
+- Applying changes to database
 ```bash
-import { clerkMiddleware } from '@clerk/nextjs/server';
-
-export default clerkMiddleware();
-
-export const config = {
-  matcher: [
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc)(.*)',
-  ],
-};
+npx drizzle-kit push
 ```
-
-### Add `ClerkProvider` to root layout
-
-```html
-import { ClerkProvider } from '@clerk/nextjs' export default function
-RootLayout({ children, }: Readonly<{ children: React.ReactNode }>) { return (
-<ClerkProvider>
-	// this one
-	<html lang="en">
-		<body
-			className="{`${geistSans.variable}"
-			${geistMono.variable}
-			antialiased`}
-		>
-			{children}
-		</body>
-	</html>
-</ClerkProvider>
-) }
-```
-
-### Build a sign-in-or-up page on `src/app/sign-in/[[...sign-in]]/page.tsx`
-
-```bash
-import { SignIn } from '@clerk/nextjs'
-
-export default function Page() {
-  return <SignIn />
-}
-```
-
-### Add to `.env`:
-
-`NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
-`NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
-`NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/`
-`NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/`
-
-- Add userButton
-- Use auth state on sidebar sections
-- Protected routes
