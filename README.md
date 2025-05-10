@@ -29,44 +29,46 @@ npm i -D drizzle-kit tsx
 ```bash
 import { drizzle } from 'drizzle-orm/neon-http';
 
-const db = drizzle(process.env.DATABASE_URL);
+export const db = drizzle(process.env.DATABASE_URL!);
+
 ```
 
 - Create user schema
   create file on `src/db` called: `schema.ts`
 
 ```js
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgTable,	text, timestamp, uniqueIndex, uuid} from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
-  id: uuid().primaryKey().defaultRandom(),
-  clerkId: text('clerk_id').unique().notNull(),
-  name: text('name').notNull(),
-  imageUrl: text('image_url').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+	id: uuid('id').primaryKey().defaultRandom(),
+	clerkId: text('clerk_id').unique().notNull(),
+	name: text('name').notNull(),
+	imageUrl: text('image_url').notNull(),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
+	updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => [uniqueIndex('clerk_id_idx').on(t.clerkId)]);
 ```
 
 - Setup Drizzle Config file
   create a file on root called : `drizzle.config.ts`
 
 ```js
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
 
+dotenv.config({ path: '.env.local' });
 export default defineConfig({
-  out: './drizzle',
-  schema: './src/db/schema.ts',
-  dialect: 'postgresql',
-  dbCredentials: {
-    url: process.env.DATABASE_URL!,
-  },
+	out: './drizzle',
+	schema: './src/db/schema.ts',
+	dialect: 'postgresql',
+	dbCredentials: {
+		url: process.env.DATABASE_URL!,
+	},
 });
-
 ```
 
 - Applying changes to database
+
 ```bash
 npx drizzle-kit push
 ```
