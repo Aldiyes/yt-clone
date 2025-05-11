@@ -5,6 +5,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import { eq } from 'drizzle-orm';
 import { cache } from 'react';
 import superjson from 'superjson';
+
 export const createTRPCContext = cache(async () => {
 	const { userId } = await auth();
 
@@ -19,6 +20,7 @@ const t = initTRPC.context<Context>().create({
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
+
 export const protectedProcedure = t.procedure.use(async function isAuthed(
 	opts
 ) {
