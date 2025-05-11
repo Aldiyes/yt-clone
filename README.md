@@ -82,3 +82,6 @@ seeding categories:
 ```bash
 npx tsx src/db/seed.ts
 ```
+
+- Prefetch categories
+- create categories component
