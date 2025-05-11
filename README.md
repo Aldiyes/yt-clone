@@ -1,47 +1,84 @@
 @Aldiyes
 
-# #07 [tRPC](https://trpc.io/docs/client/react/server-components) Configuration
+# #08 Video categories
 
-- Enable transformer on tRPC
-- Add auth to tRPC context
-- Add protectedProcedure
-- Add rate limiting using [Upstash](https://console.upstash.com/)
+- Create categories schema
 
-### Installation
+```js
+export const categories = pgTable(
+	'categories',
+	{
+		id: uuid('id').primaryKey().defaultRandom(),
+		name: text('name').notNull().unique(),
+		description: text('description'),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at').defaultNow().notNull(),
+	},
+	(t) => [uniqueIndex('name_idx').on(t.name)]
+);
+```
+
+- Push changes to the database
 
 ```bash
-npm install @upstash/redis@latest @upstash/ratelimit@latest
+npx drizzle-kit push
 ```
 
-### Configure `.env` file
-
-`UPSTASH_REDIS_REST_URL=`
-`UPSTASH_REDIS_REST_TOKEN=`
-
-### Create redis
-
-`src/lib/redis.ts`
+- Seed categories
+  `src/db/index.ts`
 
 ```js
-import { Redis } from '@upstash/redis';
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 
-export const redis = new Redis({
-	url: process.env.UPSTASH_REDIS_REST_URL,
-	token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+import { drizzle } from 'drizzle-orm/neon-http';
+
+export const db = drizzle(process.env.DATABASE_URL!);
 ```
 
-### Create Ratelimit
-
-`src/lib/ratelimit.ts`
+`src/db/seed.ts`
 
 ```js
-import { Ratelimit } from '@upstash/ratelimit';
+import { db } from '.';
+import { categories } from './schema';
 
-import { redis } from '@/lib/redis';
+const categoryNames = [
+	'Cars and vehicles',
+	'Comedy',
+	'Education',
+	'Entertainment',
+	'Film and animation',
+	'How-to and style',
+	'Music',
+	'News and politic',
+	'People and blogs',
+	'Pets and animals',
+	'Science and technology',
+	'Sports',
+	'Travel and events',
+];
 
-export const ratelimit = new Ratelimit({
-	redis,
-	limiter: Ratelimit.slidingWindow(10, '10s'),
-});
+async function main() {
+	console.log('Seeding categories');
+
+	try {
+		const values = categoryNames.map((name) => ({
+			name,
+			description: `Videos related to ${name.toLowerCase}`,
+		}));
+
+		await db.insert(categories).values(values);
+		console.log('Categories seeded successfully!');
+	} catch (error) {
+		console.error('Error seeding categories: ', error);
+	}
+}
+
+main();
+```
+
+seeding categories:
+
+```bash
+npx tsx src/db/seed.ts
 ```
