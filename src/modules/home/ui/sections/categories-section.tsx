@@ -19,7 +19,15 @@ export const CategoriesSection = ({ categoryId }: Props) => {
 	);
 };
 const CategoriesSkeleton = () => {
-	return <FilterCarousel isLoading data={[]} onSelectAction={() => {}} />;
+	return (
+		<FilterCarousel
+			isLoading
+			data={[]}
+			onSelectAction={() => {
+				return;
+			}}
+		/>
+	);
 };
 
 const CategoriesSectionSuspense = ({ categoryId }: Props) => {
