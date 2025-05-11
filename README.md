@@ -1,47 +1,25 @@
 @Aldiyes
 
-# #07 [tRPC](https://trpc.io/docs/client/react/server-components) Configuration
+# #08 Video categories
 
-- Enable transformer on tRPC
-- Add auth to tRPC context
-- Add protectedProcedure
-- Add rate limiting using [Upstash](https://console.upstash.com/)
+- Create categories schema
 
-### Installation
+```js
+export const categories = pgTable(
+	'categories',
+	{
+		id: uuid('id').primaryKey().defaultRandom(),
+		name: text('name').notNull().unique(),
+		description: text('description'),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at').defaultNow().notNull(),
+	},
+	(t) => [uniqueIndex('name_idx').on(t.name)]
+);
+```
+
+- Push changes to the database
 
 ```bash
-npm install @upstash/redis@latest @upstash/ratelimit@latest
-```
-
-### Configure `.env` file
-
-`UPSTASH_REDIS_REST_URL=`
-`UPSTASH_REDIS_REST_TOKEN=`
-
-### Create redis
-
-`src/lib/redis.ts`
-
-```js
-import { Redis } from '@upstash/redis';
-
-export const redis = new Redis({
-	url: process.env.UPSTASH_REDIS_REST_URL,
-	token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
-```
-
-### Create Ratelimit
-
-`src/lib/ratelimit.ts`
-
-```js
-import { Ratelimit } from '@upstash/ratelimit';
-
-import { redis } from '@/lib/redis';
-
-export const ratelimit = new Ratelimit({
-	redis,
-	limiter: Ratelimit.slidingWindow(10, '10s'),
-});
+npx drizzle-kit push
 ```
