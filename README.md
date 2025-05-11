@@ -1,7 +1,19 @@
 @Aldiyes
 
-# #05 Webhook sync
+# #06 [tRPC](https://trpc.io/docs/client/react/server-components) Setup
 
-- Deploy project to [Vercel](https://vercel.com) to obtain a static domain
-- Create the users [webhook](https://clerk.com/docs/webhooks/sync-data)
-- Connect the webhook on [Clerk](https://clerk.com) dashboard
+Why tRPC?
+- end-to-end typesafety
+- Familiar hooks (useQuery, useMutation, etc.)
+- V11 allow to do authentication prefetching
+
+Why prefetch?
+- "render as you fetch" concept
+- leverage RSCs ad "loader"
+- fast load time
+- parallel data loading
+
+### Installation
+```bash
+npm install @trpc/server @trpc/client @trpc/react-query @tanstack/react-query@latest zod client-only server-only
+```
