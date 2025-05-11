@@ -10,7 +10,7 @@ export const HomeLayout = ({ children }: { children: React.ReactNode }) => {
 				<HomeNavbar />
 				<div className="flex min-h-screen pt-[4rem]">
 					<HomeSidebar />
-					<main>{children}</main>
+					<main className="w-full overflow-auto">{children}</main>
 				</div>
 			</div>
 		</SidebarProvider>
