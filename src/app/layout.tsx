@@ -1,3 +1,4 @@
+import { TRPCProvider } from '@/trpc/client';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
@@ -20,7 +21,9 @@ export default function RootLayout({
 	return (
 		<ClerkProvider>
 			<html lang="en">
-				<body className={roboto.className}>{children}</body>
+				<body className={roboto.className}>
+					<TRPCProvider>{children}</TRPCProvider>
+				</body>
 			</html>
 		</ClerkProvider>
 	);
