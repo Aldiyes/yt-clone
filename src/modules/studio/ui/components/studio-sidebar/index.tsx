@@ -14,6 +14,8 @@ import {
 	SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
+import { StudioSidebarHeader } from '@/modules/studio/ui/components/studio-sidebar/studio-sidebar-header';
+
 export const StudioSidebar = () => {
 	const pathname = usePathname();
 	return (
@@ -22,6 +24,7 @@ export const StudioSidebar = () => {
 				<SidebarGroup>
 					<SidebarMenu>
 						{/* TODO: create studio-sidebar-header component */}
+						<StudioSidebarHeader />
 						<SidebarMenuItem>
 							<SidebarMenuButton
 								tooltip="Content"
