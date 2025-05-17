@@ -24,14 +24,19 @@ export async function POST(request: NextRequest) {
 		throw new Error('MUX_WEBHOOK_SECRET is not set');
 	}
 
+	console.log('🚀[SIGNING_SECRET]: ', SIGNING_SECRET);
+
 	const headersPayload = await headers();
 	const muxSignature = headersPayload.get('mux-signature');
+
+	console.log('🚀[muxSignature]: ', muxSignature);
 
 	if (!muxSignature) {
 		return new NextResponse('No signature found', { status: 401 });
 	}
 
 	const payload = await request.json();
+	console.log('🚀[payload]: ', payload);
 	const body = JSON.stringify(payload);
 
 	mux.webhooks.verifySignature(
