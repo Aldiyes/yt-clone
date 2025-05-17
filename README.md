@@ -46,3 +46,5 @@ push to database:
 ```bash
 npx drizzle-kit push
 ```
+
+- Create webhook in mux
