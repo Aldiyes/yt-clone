@@ -1,6 +1,7 @@
 @Aldiyes
 
-# #11 Infinite Loading
+# #12 Mux Integration
 
-- Add suspense and error boundaries
-- create reuseable infiniteScroll component
+- Create a responsive modal
+- Create a free Mux account
+- Create upload modal
