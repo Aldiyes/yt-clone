@@ -4,7 +4,7 @@ import { HomeView } from '@/modules/home/ui/view/home-view';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Page({
+export default async function RootHomePage({
 	searchParams,
 }: {
 	searchParams: Promise<{ categoryId?: string }>;

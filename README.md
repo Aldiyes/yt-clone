@@ -1,15 +1,33 @@
 @Aldiyes
 
-# #10 Studio Videos
+# #12 Mux Integration
 
-- Create videos schema
-  `src/db/schema.ts`
+- Create a responsive modal
+- Create a free Mux account
+  Copy and paste `.env`
+  `MUX_TOKEN_ID=`
+  `MUX_TOKEN_SECRET=`
+  then, install `@mux/mux-uploader-react` and `@mux/mux-node`
+
+```bash
+npm install @mux/mux-uploader-react @mux/mux-node
+```
+
+- Add `muxStatus` on `videos` schema
 
 ```js
 export const videos = pgTable('videos', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	title: text('title').notNull(),
 	description: text('description'),
+	// MUX
+	muxStatus: text('mux_status'),
+	muxAssetId: text('mux_asset_id').unique(),
+	muxUploadId: text('mux_upload_id').unique(),
+	muxPlaybackId: text('mux_playback_id').unique(),
+	muxTrackId: text('mux_track_id').unique(),
+	muxTrackStatus: text('mux_track_status'),
+
 	userId: uuid('user_id')
 		.references(() => users.id, {
 			onDelete: 'cascade',
@@ -21,94 +39,12 @@ export const videos = pgTable('videos', {
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
-
-export const videoRelations = relations(videos, ({ one }) => ({
-	user: one(users, {
-		fields: [videos.userId],
-		references: [users.id],
-	}),
-	category: one(categories, {
-		fields: [videos.categoryId],
-		references: [categories.id],
-	}),
-}));
-
-export const userRelations = relations(users, ({ many }) => ({
-	videos: many(videos),
-}));
-
-export const categoryRelations = relations(categories, ({ many }) => ({
-	videos: many(videos),
-}));
 ```
 
-- Push database changes
+push to database:
 
 ```bash
 npx drizzle-kit push
 ```
 
-- Create studio procedures
-  `src/modules/studio/server/procedures.ts`
-
-```js
-import { and, desc, eq, lt, or } from 'drizzle-orm';
-import { z } from 'zod';
-
-import { db } from '@/db';
-import { videos } from '@/db/schema';
-import { createTRPCRouter, protectedProcedure } from '@/trpc/init';
-
-export const studioRouter = createTRPCRouter({
-	getMany: protectedProcedure
-		.input(
-			z.object({
-				cursor: z
-					.object({
-						id: z.string().uuid(),
-						updatedAt: z.date(),
-					})
-					.nullish(),
-				limit: z.number().min(1).max(100),
-			})
-		)
-		.query(async ({ ctx, input }) => {
-			const { cursor, limit } = input;
-			const { id: userId } = ctx.user;
-			const data = await db
-				.select()
-				.from(videos)
-				.where(
-					and(
-						eq(videos.userId, userId),
-						cursor
-							? or(
-									lt(videos.updatedAt, cursor.updatedAt),
-									and(
-										eq(videos.updatedAt, cursor.updatedAt),
-										lt(videos.id, cursor.id)
-									)
-							  )
-							: undefined
-					)
-				)
-				.orderBy(desc(videos.updatedAt), desc(videos.id))
-				.limit(limit + 1);
-
-			const hasMore = data.length > limit;
-
-			// remove the last item if there is more data
-			const items = hasMore ? data.slice(0, -1) : data;
-			// set the next cursor to the last item if there is more data
-			const lastItem = items[items.length - 1];
-			const nextCursor = hasMore
-				? {
-						id: lastItem.id,
-						updatedAt: lastItem.updatedAt,
-				  }
-				: null;
-
-			return { items, nextCursor };
-		}),
-});
-```
+- Create webhook in mux
