@@ -1,13 +1,22 @@
 import Image from 'next/image';
+
 import { PiRobotFill } from 'react-icons/pi';
+
+import { formatDuration } from '@/lib/utils';
 
 type Props = {
 	title: string;
 	imageUrl?: string | null;
 	previewUrl?: string | null;
+	duration: number;
 };
 
-export const VideoThumbnail = ({ title, imageUrl, previewUrl }: Props) => {
+export const VideoThumbnail = ({
+	title,
+	imageUrl,
+	previewUrl,
+	duration,
+}: Props) => {
 	return (
 		<div className="relative group">
 			{/* Thumbnail wrapper */}
@@ -36,6 +45,9 @@ export const VideoThumbnail = ({ title, imageUrl, previewUrl }: Props) => {
 				)}
 			</div>
 			{/* TODO: video duration box */}
+			<div className="absolute bottom-2 right-2 px-1 py-0.5 rounded bg-black/80 tet-white text-xs font-medium">
+				{formatDuration(duration)}
+			</div>
 		</div>
 	);
 };
