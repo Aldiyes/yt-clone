@@ -14,7 +14,7 @@ type Props = {
 	onSuccessAction: () => void;
 };
 
-export const StudioUploader = ({ endpoint, onSuccessAction }: Props) => {
+export const StudioUploader = ({ endpoint }: Props) => {
 	return (
 		<div>
 			<MuxUploader
