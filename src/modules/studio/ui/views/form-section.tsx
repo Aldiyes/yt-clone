@@ -35,6 +35,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { VideoPlayer } from '@/modules/videos/ui/components/video-player';
 
 type Props = {
 	videoId: string;
@@ -177,6 +178,16 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 								</FormItem>
 							)}
 						/>
+					</div>
+					<div className="flex flex-col gap-y-8 lg:col-span-2">
+						<div className="flex flex-col gap-4 bg-[#f9f9f9] rounded-xl overflow-hidden h-fit">
+							<div className="aspect-video overflow-hidden relative">
+								<VideoPlayer
+									playbackId={video.muxPlaybackId}
+									thumbnailUrl={video.thumbnailUrl}
+								/>
+							</div>
+						</div>
 					</div>
 				</div>
 			</form>
