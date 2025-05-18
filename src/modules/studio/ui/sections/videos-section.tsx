@@ -122,7 +122,7 @@ const VideosSectionSuspense = () => {
 								<TableRow
 									key={video.id}
 									className="cursor-pointer"
-									onClick={() => router.push(`/studio/vidoes/${video.id}`)}
+									onClick={() => router.push(`/studio/videos/${video.id}`)}
 								>
 									<TableCell className="pl-6">
 										<div className="flex items-center gap-4">
