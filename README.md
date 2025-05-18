@@ -17,6 +17,8 @@ export const videos = pgTable('videos', {
 	muxTrackStatus: text('mux_track_status'),
 	// Add thumbnailUrl to videos schema
 	thumbnailUrl: text('thumbnail_url'),
+	previewUrl: text('preview_url'),
+	duration: integer('duration'),
 
 	userId: uuid('user_id')
 		.references(() => users.id, {
@@ -55,6 +57,7 @@ case 'video.asset.ready': {
 			}
 
 			const thumbnailUrl = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
+			const previewUrl = `https://image.mux.com/${playbackId}/animated.gif`;
 
 			await db
 				.update(videos)
@@ -63,6 +66,7 @@ case 'video.asset.ready': {
 					muxPlaybackId: playbackId,
 					muxAssetId: data.id,
 					thumbnailUrl,
+					previewUrl,
 				})
 				.where(eq(videos.muxUploadId, data.id));
 			break;
