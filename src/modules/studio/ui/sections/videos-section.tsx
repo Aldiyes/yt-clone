@@ -16,6 +16,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
+import { VideoThumbnail } from '@/modules/videos/ui/components/video-thumbnail';
 
 export const VideosSection = () => {
 	return (
@@ -62,7 +63,13 @@ const VideosSectionSuspense = () => {
 									className="cursor-pointer"
 									onClick={() => router.push(`/studio/vidoes/${video.id}`)}
 								>
-									<TableCell>{video.title}</TableCell>
+									<TableCell>
+										<div className="flex items-center gap-4">
+											<div className="relative aspect-video w-36 shrink-0">
+												<VideoThumbnail />
+											</div>
+										</div>
+									</TableCell>
 									<TableCell>Visibility</TableCell>
 									<TableCell>Status</TableCell>
 									<TableCell>Date</TableCell>
