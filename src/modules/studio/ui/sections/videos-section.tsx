@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
+import { Globe2Icon, LockIcon } from 'lucide-react';
+
 import { DEFAULT_LIMIT } from '@/constants';
 import { snakeCaseToTitle } from '@/lib/utils';
 import { trpc } from '@/trpc/client';
@@ -86,7 +88,16 @@ const VideosSectionSuspense = () => {
 											</div>
 										</div>
 									</TableCell>
-									<TableCell>Visibility</TableCell>
+									<TableCell>
+										<div className="flex items-center">
+											{video.visibility === 'private' ? (
+												<LockIcon className="size-4 mr-2" />
+											) : (
+												<Globe2Icon className="size-4 mr-2" />
+											)}
+											{snakeCaseToTitle(video.visibility)}
+										</div>
+									</TableCell>
 									<TableCell>
 										<div className="flex items-center">
 											{snakeCaseToTitle(video.muxStatus || 'error')}
