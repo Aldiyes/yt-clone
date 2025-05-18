@@ -36,3 +36,50 @@ export const videos = pgTable('videos', {
 ```bash
 npx drizzle-kit push
 ```
+
+### Handle "video.asset.ready" event
+
+`api/videos/webhook/route.ts`
+
+```js
+case 'video.asset.ready': {
+			const data = payload.data as VideoAssetReadyWebhookEvent['data'];
+			const playbackId = data.playback_ids?.[0].id;
+
+			if (!data.upload_id) {
+				return new NextResponse('Missing upload ID', { status: 400 });
+			}
+
+			if (!playbackId) {
+				return new NextResponse('Missing playback ID', { status: 400 });
+			}
+
+			const thumbnailUrl = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
+
+			await db
+				.update(videos)
+				.set({
+					muxStatus: data.status,
+					muxPlaybackId: playbackId,
+					muxAssetId: data.id,
+					thumbnailUrl,
+				})
+				.where(eq(videos.muxUploadId, data.id));
+			break;
+		}
+```
+
+- assign thumbnail
+- assign preview
+
+### Handle "video.asset.errored" event
+
+- update status
+
+### Handle "video.asset.deleted" event
+
+- delete from database
+
+### Handle "video.asset.track.ready" event
+
+- update trackId and trackStatus
