@@ -18,6 +18,7 @@ export const videos = pgTable('videos', {
 	// Add thumbnailUrl to videos schema
 	thumbnailUrl: text('thumbnail_url'),
 	previewUrl: text('preview_url'),
+	duration: integer('duration'),
 
 	userId: uuid('user_id')
 		.references(() => users.id, {
