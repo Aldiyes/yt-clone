@@ -17,6 +17,7 @@ export const videos = pgTable('videos', {
 	muxTrackStatus: text('mux_track_status'),
 	// Add thumbnailUrl to videos schema
 	thumbnailUrl: text('thumbnail_url'),
+	previewUrl: text('preview_url'),
 
 	userId: uuid('user_id')
 		.references(() => users.id, {

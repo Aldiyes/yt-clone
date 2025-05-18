@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { PiRobotFill } from 'react-icons/pi';
 
 type Props = {
-	imageUrl?: string;
+	imageUrl?: string | null;
 };
 
 export const VideoThumbnail = ({ imageUrl }: Props) => {
