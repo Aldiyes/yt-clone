@@ -89,6 +89,24 @@ case 'video.asset.ready': {
 
 - update status
 
+```js
+case 'video.asset.errored': {
+			const data = payload.data as VideoAssetErroredWebhookEvent['data'];
+
+			if (!data.upload_id) {
+				return new NextResponse('Missing upload ID', { status: 400 });
+			}
+
+			await db
+				.update(videos)
+				.set({
+					muxStatus: data.status,
+				})
+				.where(eq(videos.muxUploadId, data.upload_id));
+			break;
+		}
+```
+
 ### Handle "video.asset.deleted" event
 
 - delete from database

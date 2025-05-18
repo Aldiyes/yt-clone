@@ -91,6 +91,22 @@ export async function POST(req: NextRequest) {
 				.where(eq(videos.muxUploadId, data.id));
 			break;
 		}
+
+		case 'video.asset.errored': {
+			const data = payload.data as VideoAssetErroredWebhookEvent['data'];
+
+			if (!data.upload_id) {
+				return new NextResponse('Missing upload ID', { status: 400 });
+			}
+
+			await db
+				.update(videos)
+				.set({
+					muxStatus: data.status,
+				})
+				.where(eq(videos.muxUploadId, data.upload_id));
+			break;
+		}
 	}
 
 	return new NextResponse('Webhook recived', { status: 200 });
