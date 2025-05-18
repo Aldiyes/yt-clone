@@ -31,6 +31,7 @@ export const VideoThumbnail = ({
 						/>
 						{previewUrl && (
 							<Image
+								unoptimized={!!previewUrl}
 								src={previewUrl}
 								alt={title}
 								fill
