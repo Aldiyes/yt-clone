@@ -1,6 +1,3 @@
-import { db } from '@/db';
-import { videos } from '@/db/schema';
-import { mux } from '@/lib/mux';
 import {
 	VideoAssetCreatedWebhookEvent,
 	VideoAssetErroredWebhookEvent,
@@ -11,6 +8,10 @@ import { eq } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { db } from '@/db';
+import { videos } from '@/db/schema';
+import { mux } from '@/lib/mux';
+
 type WebhookEvent =
 	| VideoAssetCreatedWebhookEvent
 	| VideoAssetErroredWebhookEvent
@@ -19,7 +20,7 @@ type WebhookEvent =
 
 const SIGNING_SECRET = process.env.MUX_WEBHOOK_SECRET!;
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
 	if (!SIGNING_SECRET) {
 		throw new Error('MUX_WEBHOOK_SECRET is not set');
 	}
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
 		return new NextResponse('No signature found', { status: 401 });
 	}
 
-	const payload = await request.json();
+	const payload = await req.json();
 	const body = JSON.stringify(payload);
 
 	mux.webhooks.verifySignature(
