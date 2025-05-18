@@ -1,8 +1,13 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { MoreVerticalIcon, TrashIcon } from 'lucide-react';
-import { Suspense } from 'react';
+import {
+	CopyCheckIcon,
+	CopyIcon,
+	MoreVerticalIcon,
+	TrashIcon,
+} from 'lucide-react';
+import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -36,6 +41,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { VideoPlayer } from '@/modules/videos/ui/components/video-player';
+import Link from 'next/link';
 
 type Props = {
 	videoId: string;
@@ -58,6 +64,7 @@ const FormSectionSkeleton = () => {
 const FormSectionSuspense = ({ videoId }: Props) => {
 	const [video] = trpc.studio.getOne.useSuspenseQuery({ id: videoId });
 	const [categories] = trpc.categories.getMany.useSuspenseQuery();
+	const [isCopied, setIsCopied] = useState(false);
 
 	const utils = trpc.useUtils();
 
@@ -79,6 +86,19 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 
 	const onSubmit = (values: z.infer<typeof videoUpdateSchema>) => {
 		update.mutateAsync(values);
+	};
+
+	const fullUrl = `${
+		process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+	}/videos/${video.id}`;
+
+	const onCopy = async () => {
+		await navigator.clipboard.writeText(fullUrl);
+		setIsCopied(true);
+
+		setTimeout(() => {
+			setIsCopied(false);
+		}, 2000);
 	};
 
 	return (
@@ -186,6 +206,30 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 									playbackId={video.muxPlaybackId}
 									thumbnailUrl={video.thumbnailUrl}
 								/>
+							</div>
+							<div className="p-4 flex flex-col gap-y-6">
+								<div className="flex justify-between items-center gap-x-2">
+									<div className="flex flex-col gap-y-1">
+										<p className="text-muted-foreground text-xs">Video link</p>
+										<div className="flex items-center gap-x-2">
+											<Link href={`/videos/${video.id}`}>
+												<p className="line-clamp-1 text-sm text-blue-500">
+													{fullUrl}
+												</p>
+											</Link>
+											<Button
+												type="button"
+												variant="ghost"
+												size="icon"
+												className="shrink-0"
+												onClick={onCopy}
+												disabled={isCopied}
+											>
+												{isCopied ? <CopyCheckIcon /> : <CopyIcon />}
+											</Button>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
