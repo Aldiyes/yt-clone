@@ -5,6 +5,7 @@ import { MoreVerticalIcon, TrashIcon } from 'lucide-react';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { videoUpdateSchema } from '@/db/schema';
@@ -57,13 +58,26 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 	const [video] = trpc.studio.getOne.useSuspenseQuery({ id: videoId });
 	const [categories] = trpc.categories.getMany.useSuspenseQuery();
 
+	const utils = trpc.useUtils();
+
+	const update = trpc.videos.update.useMutation({
+		onSuccess: () => {
+			utils.studio.getMany.invalidate();
+			utils.studio.getOne.invalidate({ id: videoId });
+			toast.success('Video updated');
+		},
+		onError: (error) => {
+			toast.error(error.message || 'Something went wrong');
+		},
+	});
+
 	const form = useForm<z.infer<typeof videoUpdateSchema>>({
 		resolver: zodResolver(videoUpdateSchema),
 		defaultValues: video,
 	});
 
-	const onSubmit = async (values: z.infer<typeof videoUpdateSchema>) => {
-		console.log('[🚀 ~ onSubmit ~ values]: ', values);
+	const onSubmit = (values: z.infer<typeof videoUpdateSchema>) => {
+		update.mutateAsync(values);
 	};
 
 	return (
@@ -77,7 +91,7 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 						</p>
 					</div>
 					<div className="flex items-center gap-x-2">
-						<Button type="submit" disabled={false}>
+						<Button type="submit" disabled={update.isPending}>
 							Save
 						</Button>
 						<DropdownMenu>
