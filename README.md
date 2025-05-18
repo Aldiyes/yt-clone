@@ -57,6 +57,7 @@ case 'video.asset.ready': {
 			}
 
 			const thumbnailUrl = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
+			const previewUrl = `https://image.mux.com/${playbackId}/animated.gif`;
 
 			await db
 				.update(videos)
@@ -65,6 +66,7 @@ case 'video.asset.ready': {
 					muxPlaybackId: playbackId,
 					muxAssetId: data.id,
 					thumbnailUrl,
+					previewUrl,
 				})
 				.where(eq(videos.muxUploadId, data.id));
 			break;
