@@ -62,10 +62,8 @@ export async function POST(req: NextRequest) {
 		}
 
 		case 'video.asset.ready': {
-			console.log('[🚀case: video.asset.ready');
 			const data = payload.data as VideoAssetReadyWebhookEvent['data'];
 			const playbackId = data.playback_ids?.[0].id;
-			console.log('[🚀 ~ POST ~ playbackId]: ', playbackId);
 
 			if (!data.upload_id) {
 				return new NextResponse('Missing upload ID', { status: 400 });
@@ -77,12 +75,7 @@ export async function POST(req: NextRequest) {
 
 			const thumbnailUrl = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
 
-			console.log('[🚀 ~ POST ~ thumbnailUrl]: ', thumbnailUrl);
-
-			console.log('🚀[videos.muxUploadId]: ', videos.muxUploadId);
 			console.log('🚀[data.id]: ', data.id);
-			console.log('🚀[playbackId]: ', playbackId);
-			console.log('🚀[data.status]: ', data.status);
 
 			await db
 				.update(videos)
