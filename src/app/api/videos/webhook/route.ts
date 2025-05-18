@@ -79,6 +79,11 @@ export async function POST(req: NextRequest) {
 
 			console.log('[🚀 ~ POST ~ thumbnailUrl]: ', thumbnailUrl);
 
+			console.log('🚀[videos.muxUploadId]: ', videos.muxUploadId);
+			console.log('🚀[data.id]: ', data.id);
+			console.log('🚀[playbackId]: ', playbackId);
+			console.log('🚀[data.status]: ', data.status);
+
 			await db
 				.update(videos)
 				.set({
