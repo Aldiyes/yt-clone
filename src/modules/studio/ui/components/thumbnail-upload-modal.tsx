@@ -32,7 +32,7 @@ export const ThumbnailUploadModal = ({
 				endpoint="thumbnailUploader"
 				input={{ videoId }}
 				onClientUploadComplete={onUploadComplete}
-				className="ut-label:text-lg ut-button:bg-primary ut-allowed-content:ut-uploading:text-red-300"
+				className="ut-label:text-lg ut-button:bg-primary ut-button:mb-10 ut-upload-icon:mt-8 ut-allowed-content:ut-uploading:text-red-300"
 			/>
 		</ResponsiveModal>
 	);
