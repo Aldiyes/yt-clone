@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
 	CopyCheckIcon,
 	CopyIcon,
+	Globe2Icon,
+	LockIcon,
 	MoreVerticalIcon,
 	TrashIcon,
 } from 'lucide-react';
@@ -40,6 +42,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { snakeCaseToTitle } from '@/lib/utils';
 import { VideoPlayer } from '@/modules/videos/ui/components/video-player';
 import Link from 'next/link';
 
@@ -230,8 +233,63 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 										</div>
 									</div>
 								</div>
+
+								<div className="flex justify-between items-center">
+									<div className="flex flex-col gap-y-1">
+										<p className="text-xs text-muted-foreground">
+											Video status
+										</p>
+										<p className="text-sm">
+											{snakeCaseToTitle(video.muxStatus || 'Preparing')}
+										</p>
+									</div>
+								</div>
+								<div className="flex justify-between items-center">
+									<div className="flex flex-col gap-y-1">
+										<p className="text-xs text-muted-foreground">
+											Subtitles status
+										</p>
+										<p className="text-sm">
+											{snakeCaseToTitle(video.muxTrackStatus || 'no_audio')}
+										</p>
+									</div>
+								</div>
 							</div>
 						</div>
+						<FormField
+							control={form.control}
+							name="visibility"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Visibility</FormLabel>
+									<Select
+										onValueChange={field.onChange}
+										defaultValue={field.value ?? undefined}
+									>
+										<FormControl>
+											<SelectTrigger>
+												<SelectValue placeholder="Select visibility" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											<SelectItem value="public">
+												<div className="flex items-center">
+													<Globe2Icon className="size-4 mr-2 text-muted-foreground" />
+													Public
+												</div>
+											</SelectItem>
+											<SelectItem value="private">
+												<div className="flex items-center">
+													<LockIcon className="size-4 mr-2 text-muted-foreground" />
+													Private
+												</div>
+											</SelectItem>
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 					</div>
 				</div>
 			</form>
