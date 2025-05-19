@@ -84,11 +84,6 @@ export async function POST(req: NextRequest) {
 			const [uploadedThumbnail, uploadedPreview] =
 				await utapi.uploadFilesFromUrl([tempThumbnailUrl, tempPreviewUrl]);
 
-			console.log({
-				uploadedThumbnail: uploadedThumbnail.data,
-				uploadedPreview: uploadedPreview.data,
-			});
-
 			if (!uploadedThumbnail.data || !uploadedPreview.data) {
 				return new NextResponse('Failed to upload thumbnail or preview', {
 					status: 400,
