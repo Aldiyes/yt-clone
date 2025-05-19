@@ -1,12 +1,17 @@
 @Aldiyes
 
-# #14 Video Form
+# #15 Video Thumbnails
 
-- Add skeleton to videos-section
-- Create video form page
-- Create video player
-- Add ability to update video information
-  - title
-  - description
-  - category
-  - visibility
+### Integrate [UploadThing](https://uploadthing.com)
+
+- Install the packages
+
+```bash
+npm install uploadthing @uploadthing/react
+```
+
+- Add `.env` variables
+
+```bash
+UPLOADTHING_TOKEN=... # A token for interacting with the SDK
+```
