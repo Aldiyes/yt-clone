@@ -1,3 +1,5 @@
+import { UploadDropzone } from '@/lib/uploadthing';
+
 import { ResponsiveModal } from '@/components/responsive-modal';
 
 type Props = {
@@ -17,7 +19,10 @@ export const ThumbnailUploadModal = ({
 			open={open}
 			onOpenChangeAction={onOpenChangeAction}
 		>
-			<p>Hello</p>
+			<UploadDropzone
+				endpoint="imageUploader"
+				className="ut-label:text-lg ut-button:bg-primary ut-allowed-content:ut-uploading:text-red-300"
+			/>
 		</ResponsiveModal>
 	);
 };
