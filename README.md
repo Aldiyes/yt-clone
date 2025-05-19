@@ -1,12 +1,98 @@
 @Aldiyes
 
-# #14 Video Form
+# #15 Video Thumbnails
 
-- Add skeleton to videos-section
-- Create video form page
-- Create video player
-- Add ability to update video information
-  - title
-  - description
-  - category
-  - visibility
+### Integrate [UploadThing](https://uploadthing.com)
+
+- Install the packages
+
+```bash
+npm install uploadthing @uploadthing/react
+```
+
+- Add `.env` variables
+
+```bash
+UPLOADTHING_TOKEN=... # A token for interacting with the SDK
+```
+
+- Setup a FileRouter
+  `src/app/api/uploadthing/core.ts`
+
+```js
+import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { UploadThingError } from "uploadthing/server";
+
+const f = createUploadthing();
+
+const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
+
+// FileRouter for your app, can contain multiple FileRoutes
+export const ourFileRouter = {
+  // Define as many FileRoutes as you like, each with a unique routeSlug
+  imageUploader: f({
+    image: {
+      /**
+       * For full list of options and defaults, see the File Route API reference
+       * @see https://docs.uploadthing.com/file-routes#route-config
+       */
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+    // Set permissions and file types for this FileRoute
+    .middleware(async ({ req }) => {
+      // This code runs on your server before upload
+      const user = await auth(req);
+
+      // If you throw, the user will not be able to upload
+      if (!user) throw new UploadThingError("Unauthorized");
+
+      // Whatever is returned here is accessible in onUploadComplete as `metadata`
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      // This code RUNS ON YOUR SERVER after upload
+      console.log("Upload complete for userId:", metadata.userId);
+
+      console.log("file url", file.ufsUrl);
+
+      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      return { uploadedBy: metadata.userId };
+    }),
+} satisfies FileRouter;
+
+export type OurFileRouter = typeof ourFileRouter;
+```
+
+- Create a Next.js API route using the FileRouter
+  `src/app/api/uploadthing/route.ts`
+
+```js
+import { createRouteHandler } from 'uploadthing/next';
+
+import { ourFileRouter } from './core';
+
+// Export routes for Next App Router
+export const { GET, POST } = createRouteHandler({
+	router: ourFileRouter,
+
+	// Apply an (optional) custom config:
+	// config: { ... },
+});
+```
+
+- Create The UploadThing Components
+  `src/lib/uploadthing.ts`
+
+```js
+import {
+  generateUploadButton,
+  generateUploadDropzone,
+} from "@uploadthing/react";
+
+import type { OurFileRouter } from "~/app/api/uploadthing/core";
+
+export const UploadButton = generateUploadButton<OurFileRouter>();
+export const UploadDropzone = generateUploadDropzone<OurFileRouter>();
+```

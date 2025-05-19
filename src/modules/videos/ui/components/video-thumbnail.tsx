@@ -2,6 +2,7 @@ import Image from 'next/image';
 
 import { PiRobotFill } from 'react-icons/pi';
 
+import { THUMBNAIL_FALLBACK } from '@/constants';
 import { formatDuration } from '@/lib/utils';
 
 type Props = {
@@ -24,7 +25,7 @@ export const VideoThumbnail = ({
 				{imageUrl ? (
 					<>
 						<Image
-							src={imageUrl}
+							src={imageUrl || THUMBNAIL_FALLBACK}
 							alt={title}
 							fill
 							className="size-full object-cover group-hover:opacity-0"
@@ -32,7 +33,7 @@ export const VideoThumbnail = ({
 						{previewUrl && (
 							<Image
 								unoptimized={!!previewUrl}
-								src={previewUrl}
+								src={previewUrl || THUMBNAIL_FALLBACK}
 								alt={title}
 								fill
 								className="size-full object-cover opacity-0 group-hover:opacity-100"
