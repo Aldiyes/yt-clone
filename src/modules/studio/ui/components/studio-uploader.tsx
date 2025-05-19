@@ -14,13 +14,14 @@ type Props = {
 	onSuccessAction: () => void;
 };
 
-export const StudioUploader = ({ endpoint }: Props) => {
+export const StudioUploader = ({ endpoint, onSuccessAction }: Props) => {
 	return (
 		<div>
 			<MuxUploader
 				endpoint={endpoint}
 				id={MUX_UPLOADER_ID}
 				className="hidden group/uploader"
+				onSuccess={onSuccessAction}
 			/>
 			<MuxUploaderDrop muxUploader={MUX_UPLOADER_ID} className="group/drop">
 				<div
