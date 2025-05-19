@@ -5,8 +5,11 @@ import {
 	CopyCheckIcon,
 	CopyIcon,
 	Globe2Icon,
+	ImagePlusIcon,
 	LockIcon,
 	MoreVerticalIcon,
+	RotateCcw,
+	SparklesIcon,
 	TrashIcon,
 } from 'lucide-react';
 import { Suspense, useState } from 'react';
@@ -42,8 +45,10 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { THUMBNAIL_FALLBACK } from '@/constants';
 import { snakeCaseToTitle } from '@/lib/utils';
 import { VideoPlayer } from '@/modules/videos/ui/components/video-player';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -138,7 +143,9 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
-								<DropdownMenuItem onClick={() => remove.mutate({ id: videoId })}>
+								<DropdownMenuItem
+									onClick={() => remove.mutate({ id: videoId })}
+								>
 									<TrashIcon className="size-4 mr-4" />
 									Delete
 								</DropdownMenuItem>
@@ -177,12 +184,56 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 										<Textarea
 											{...field}
 											placeholder="Add a description to your video"
-											value={field.value ?? ''}
+											value={field.value || ''}
 											rows={10}
 											className="resize-none pr-10"
 										/>
 									</FormControl>
 									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="thumbnailUrl"
+							render={() => (
+								<FormItem>
+									<FormLabel>Thumbnail</FormLabel>
+									<FormControl>
+										<div className="p-0.5 border border-dashed border-neutral-400 relative h-[84px] w-[153px] group">
+											<Image
+												src={video.thumbnailUrl || THUMBNAIL_FALLBACK}
+												fill
+												alt="Thumbnail"
+												className="object-cover"
+											/>
+											<DropdownMenu>
+												<DropdownMenuTrigger asChild>
+													<Button
+														type="button"
+														size="icon"
+														className="bg-black/50 hover:bg-black/50 absolute top-1 right-1 rounded-full opacity-100 md:opacity-0 group-hover:opacity-100 duration-300 size-7"
+													>
+														<MoreVerticalIcon className="text-white" />
+													</Button>
+												</DropdownMenuTrigger>
+												<DropdownMenuContent align="start" side="right">
+													<DropdownMenuItem>
+														<ImagePlusIcon className="size-4 mr-1" />
+														Change
+													</DropdownMenuItem>
+													<DropdownMenuItem>
+														<SparklesIcon className="size-4 mr-1" />
+														AR-generated
+													</DropdownMenuItem>
+													<DropdownMenuItem>
+														<RotateCcw className="size-4 mr-1" />
+														Restore
+													</DropdownMenuItem>
+												</DropdownMenuContent>
+											</DropdownMenu>
+										</div>
+									</FormControl>
 								</FormItem>
 							)}
 						/>
@@ -195,7 +246,7 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 									<FormLabel>Category</FormLabel>
 									<Select
 										onValueChange={field.onChange}
-										defaultValue={field.value ?? undefined}
+										defaultValue={field.value || undefined}
 									>
 										<FormControl>
 											<SelectTrigger>
@@ -277,7 +328,7 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 									<FormLabel>Visibility</FormLabel>
 									<Select
 										onValueChange={field.onChange}
-										defaultValue={field.value ?? undefined}
+										defaultValue={field.value || undefined}
 									>
 										<FormControl>
 											<SelectTrigger>
