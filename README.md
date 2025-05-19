@@ -1,155 +1,98 @@
 @Aldiyes
 
-# #13 Mux Webhook
+# #15 Video Thumbnails
 
-### Update video schema
+### Integrate [UploadThing](https://uploadthing.com)
+
+- Install the packages
+
+```bash
+npm install uploadthing @uploadthing/react
+```
+
+- Add `.env` variables
+
+```bash
+UPLOADTHING_TOKEN=... # A token for interacting with the SDK
+```
+
+- Setup a FileRouter
+  `src/app/api/uploadthing/core.ts`
 
 ```js
-export const videoVisibility = pgEnum('video_visibility', [
-	'private',
-	'public',
-]);
+import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { UploadThingError } from "uploadthing/server";
 
-export const videos = pgTable('videos', {
-	id: uuid('id').primaryKey().defaultRandom(),
-	title: text('title').notNull(),
-	description: text('description'),
-	// MUX
-	muxStatus: text('mux_status'),
-	muxAssetId: text('mux_asset_id').unique(),
-	muxUploadId: text('mux_upload_id').unique(),
-	muxPlaybackId: text('mux_playback_id').unique(),
-	muxTrackId: text('mux_track_id').unique(),
-	muxTrackStatus: text('mux_track_status'),
-	thumbnailUrl: text('thumbnail_url'),
-	previewUrl: text('preview_url'),
-	duration: integer('duration').default(0).notNull(),
-	visibility: videoVisibility('visibility').default('private').notNull(),
+const f = createUploadthing();
 
-	userId: uuid('user_id')
-		.references(() => users.id, {
-			onDelete: 'cascade',
-		})
-		.notNull(),
-	categoryId: uuid('category_id').references(() => categories.id, {
-		onDelete: 'set null',
-	}),
-	createdAt: timestamp('created_at').defaultNow().notNull(),
-	updatedAt: timestamp('updated_at').defaultNow().notNull(),
+const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
+
+// FileRouter for your app, can contain multiple FileRoutes
+export const ourFileRouter = {
+  // Define as many FileRoutes as you like, each with a unique routeSlug
+  imageUploader: f({
+    image: {
+      /**
+       * For full list of options and defaults, see the File Route API reference
+       * @see https://docs.uploadthing.com/file-routes#route-config
+       */
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+    // Set permissions and file types for this FileRoute
+    .middleware(async ({ req }) => {
+      // This code runs on your server before upload
+      const user = await auth(req);
+
+      // If you throw, the user will not be able to upload
+      if (!user) throw new UploadThingError("Unauthorized");
+
+      // Whatever is returned here is accessible in onUploadComplete as `metadata`
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      // This code RUNS ON YOUR SERVER after upload
+      console.log("Upload complete for userId:", metadata.userId);
+
+      console.log("file url", file.ufsUrl);
+
+      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      return { uploadedBy: metadata.userId };
+    }),
+} satisfies FileRouter;
+
+export type OurFileRouter = typeof ourFileRouter;
+```
+
+- Create a Next.js API route using the FileRouter
+  `src/app/api/uploadthing/route.ts`
+
+```js
+import { createRouteHandler } from 'uploadthing/next';
+
+import { ourFileRouter } from './core';
+
+// Export routes for Next App Router
+export const { GET, POST } = createRouteHandler({
+	router: ourFileRouter,
+
+	// Apply an (optional) custom config:
+	// config: { ... },
 });
 ```
 
-### Push database changes
-
-```bash
-npx drizzle-kit push
-```
-
-### Handle "video.asset.ready" event
-
-`api/videos/webhook/route.ts`
+- Create The UploadThing Components
+  `src/lib/uploadthing.ts`
 
 ```js
-case 'video.asset.ready': {
-			const data = payload.data as VideoAssetReadyWebhookEvent['data'];
-			const playbackId = data.playback_ids?.[0].id;
+import {
+  generateUploadButton,
+  generateUploadDropzone,
+} from "@uploadthing/react";
 
-			if (!data.upload_id) {
-				return new NextResponse('Missing upload ID', { status: 400 });
-			}
+import type { OurFileRouter } from "~/app/api/uploadthing/core";
 
-			if (!playbackId) {
-				return new NextResponse('Missing playback ID', { status: 400 });
-			}
-
-			const thumbnailUrl = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
-			const previewUrl = `https://image.mux.com/${playbackId}/animated.gif`;
-
-			const duration = data.duration ? Math.round(data.duration * 1000) : 0;
-
-			await db
-				.update(videos)
-				.set({
-					muxStatus: data.status,
-					muxPlaybackId: playbackId,
-					muxAssetId: data.id,
-					thumbnailUrl,
-					previewUrl,
-					duration
-				})
-				.where(eq(videos.muxUploadId, data.id));
-			break;
-		}
-```
-
-- assign thumbnail
-- assign preview
-
-### Handle "video.asset.errored" event
-
-- update status
-
-```js
-case 'video.asset.errored': {
-			const data = payload.data as VideoAssetErroredWebhookEvent['data'];
-
-			if (!data.upload_id) {
-				return new NextResponse('Missing upload ID', { status: 400 });
-			}
-
-			await db
-				.update(videos)
-				.set({
-					muxStatus: data.status,
-				})
-				.where(eq(videos.muxUploadId, data.upload_id));
-			break;
-		}
-```
-
-### Handle "video.asset.deleted" event
-
-- delete from database
-
-```js
-case 'video.asset.deleted': {
-			const data = payload.data as VideoAssetDeletedWebhookEvent['data'];
-
-			if (!data.upload_id) {
-				return new NextResponse('Missing upload ID', { status: 400 });
-			}
-
-			await db.delete(videos).where(eq(videos.muxUploadId, data.upload_id));
-			break;
-		}
-```
-
-### Handle "video.asset.track.ready" event
-
-- update trackId and trackStatus
-
-```js
-case 'video.asset.track.ready': {
-			const data = payload.data as VideoAssetTrackReadyWebhookEvent['data'] & {
-				asset_id: string;
-			};
-
-			const assetId = data.asset_id;
-			const trackId = data.id;
-			const status = data.status;
-
-			if (!assetId) {
-				return new NextResponse('Missing asset ID', { status: 400 });
-			}
-
-			await db
-				.update(videos)
-				.set({
-					muxTrackId: trackId,
-					muxTrackStatus: status,
-				})
-				.where(eq(videos.muxAssetId, assetId));
-
-			break;
-		}
+export const UploadButton = generateUploadButton<OurFileRouter>();
+export const UploadDropzone = generateUploadDropzone<OurFileRouter>();
 ```
