@@ -45,6 +45,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { snakeCaseToTitle } from '@/lib/utils';
 import { VideoPlayer } from '@/modules/videos/ui/components/video-player';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 type Props = {
 	videoId: string;
@@ -68,6 +69,7 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 	const [video] = trpc.studio.getOne.useSuspenseQuery({ id: videoId });
 	const [categories] = trpc.categories.getMany.useSuspenseQuery();
 	const [isCopied, setIsCopied] = useState(false);
+	const router = useRouter();
 
 	const utils = trpc.useUtils();
 
@@ -76,6 +78,17 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 			utils.studio.getMany.invalidate();
 			utils.studio.getOne.invalidate({ id: videoId });
 			toast.success('Video updated');
+		},
+		onError: (error) => {
+			toast.error(error.message || 'Something went wrong');
+		},
+	});
+
+	const remove = trpc.videos.remove.useMutation({
+		onSuccess: () => {
+			utils.studio.getMany.invalidate();
+			toast.success('Video removed');
+			router.push('/studio');
 		},
 		onError: (error) => {
 			toast.error(error.message || 'Something went wrong');
@@ -125,7 +138,7 @@ const FormSectionSuspense = ({ videoId }: Props) => {
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
-								<DropdownMenuItem>
+								<DropdownMenuItem onClick={() => remove.mutate({ id: videoId })}>
 									<TrashIcon className="size-4 mr-4" />
 									Delete
 								</DropdownMenuItem>
